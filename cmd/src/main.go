@@ -7,41 +7,25 @@ import (
 )
 
 func main() {
-	/* ejercicio1 := MatrizExtendida{
-		Ecuaciones: [][]float64{
-			{4.0, 14.3, -2.0514748815},
-			{14.3, 59.45, -6.4484474547},
-			{-2.0514748815, -6.4484474547, 1.5974511381},
-		},
-		Igualdades: []float64{14.1, 56.03, -6.8842498511},
-	}
-	ejercicio1.Mostrar()
-	results := ejercicio1.Montante()
-	for i := range results {
-		fmt.Println(results[i])
-	}
-	ejercicio2 := MatrizExtendida{
-		Ecuaciones: [][]float64{
-			{4.0, 14.3, 59.45, -2.0514748815},
-			{14.3, 59.45, 271.883, -6.4484474547},
-			{59.45, 271.883, 1308.2129, -23.8850981208},
-			{-2.0514748815, -6.4484474547, -23.8850981208, 1.597451138},
-		},
-		Igualdades: []float64{14.1, 56.03, 250.433, -6.8842498511},
-	}
-	ejercicio2.Mostrar()
-	results = ejercicio2.Montante()
-	for i := range results {
-		fmt.Println(results[i])
-	}
-	*/
-	results, err := LinealConFuncion([]float64{1.9, 2.4, 4.8, 5.2}, []float64{2.5, 2.7, 3.7, 5.2}, func(x float64) float64 { return 1 / math.Tan(x) })
+	x := []float64{1.9, 2.4, 4.8, 5.2}
+	y := []float64{2.5, 2.7, 3.7, 5.2}
+	f := func(x float64) float64 { return 1 / math.Tan(x) }
+	g, err := LinealConFuncion(x, y, f)
 	if err != nil {
 		panic(err)
 	}
-	for i := range results {
-		fmt.Println(results[i])
+	fmt.Println(g(1.9))
+	fmt.Println(g(2.4))
+	fmt.Println(g(4.8))
+	fmt.Println(g(5.2))
+	g, err = CuadraticaConFuncion(x, y, f)
+	if err != nil {
+		panic(err)
 	}
+	fmt.Println(g(1.9))
+	fmt.Println(g(2.4))
+	fmt.Println(g(4.8))
+	fmt.Println(g(5.2))
 
 	/* f, err := cubica([]float64{-2, -1, 0, 1, 2}, []float64{3, 0, 2, 4, 4})
 	if err != nil {
@@ -69,15 +53,14 @@ type MatrizExtendida struct {
 }
 
 func (m MatrizExtendida) Mostrar() {
-	charr := []string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"}
 	for i := range len(m.Ecuaciones) {
 		for j := range len(m.Ecuaciones) {
-			fmt.Printf("%v%v", m.Ecuaciones[i][j], charr[j%26])
+			fmt.Printf("%.9f a%v", m.Ecuaciones[i][j], i)
 			if j < len(m.Ecuaciones)-1 {
 				fmt.Print(" + ")
 			}
 		}
-		fmt.Printf(" = %v\n", m.Igualdades[i])
+		fmt.Printf(" = %.9f\n", m.Igualdades[i])
 	}
 }
 
@@ -143,7 +126,7 @@ func (m MatrizExtendida) Montante() []float64 {
 	return results
 }
 
-func cubica(x []float64, y []float64) (func(float64) float64, error) {
+func Cubica(x []float64, y []float64) (func(float64) float64, error) {
 	if len(x) != len(y) {
 		return nil, errors.New("lengths don't match")
 	}
@@ -187,8 +170,7 @@ func cubica(x []float64, y []float64) (func(float64) float64, error) {
 	}, nil
 }
 
-func cuadratica(x []float64, y []float64) (func(float64) float64, error) {
-	println("CUADRATICAS")
+func Cuadratica(x []float64, y []float64) (func(float64) float64, error) {
 	if len(x) != len(y) {
 		return func(x float64) float64 { return 0.0 }, errors.New("lengths don't match")
 	}
@@ -228,14 +210,14 @@ func cuadratica(x []float64, y []float64) (func(float64) float64, error) {
 }
 
 // g(x) = a + bx + cf(x)
-func LinealConFuncion(x []float64, y []float64, f func(float64) float64) ([]float64, error) {
+func LinealConFuncion(x []float64, y []float64, f func(float64) float64) (func(float64) float64, error) {
 	if len(x) != len(y) {
 		return nil, errors.New("lengths dont match")
 	}
 	sums := [8]float64{}
-	fmt.Printf("x\ty\tx2\tf(x)\txf(x)\tf(x)2\txy\tyf(x)")
+	fmt.Printf("x\ty\tx2\tf(x)\txf(x)\tf(x)2\txy\tyf(x)\n")
 	for i := range x {
-		fmt.Printf("%v\t%v\t%v\t%v\t%v\t%v\t%v\t%v\t%v\t%v\n", x[i], y[i], math.Pow(x[i], 2), f(x[i]), x[i]*f(x[i]), math.Pow(f(x[i]), 2), x[i]*y[i], y[i]*f(x[i]))
+		fmt.Printf("%.9f\t%.9f\t%.9f\t%.9f\t%.9f\t%.9f\t%.9f\t%.9f\n", x[i], y[i], math.Pow(x[i], 2), f(x[i]), x[i]*f(x[i]), math.Pow(f(x[i]), 2), x[i]*y[i], y[i]*f(x[i]))
 		sums[0] += x[i]
 		sums[1] += y[i]
 		sums[2] += math.Pow(x[i], 2)
@@ -262,5 +244,60 @@ func LinealConFuncion(x []float64, y []float64, f func(float64) float64) ([]floa
 	m.Organizar()
 	fmt.Println()
 	m.Mostrar()
-	return m.Montante(), nil
+	results := m.Montante()
+	for i := range results {
+		fmt.Printf("%.9f a%v\n", results[i], i)
+	}
+	return func(x float64) float64 { return results[0] + results[1]*x + results[2]*f(x) }, nil
+}
+
+// g(x) = a + bx + ax^2 + a3f(x)
+func CuadraticaConFuncion(x []float64, y []float64, f func(float64) float64) (func(float64) float64, error) {
+	if len(x) != len(y) {
+		return nil, errors.New("lengths dont match")
+	}
+	sums := [12]float64{}
+	fmt.Printf("x\ty\tx2\tx3\tx4\tf(x)\txf(x)\tx2f(x)\tf(x)2\txy\tx2y\tyf(x)\n")
+	for i := range x {
+		fmt.Printf("%.9f\t%.9f\t%.9f\t%.9f\t%.9f\t%.9f\t%.9f\t%.9f\t%.9f\t%.9f\t%.9f\t%.9f\n",
+			x[i], y[i], math.Pow(x[i], 2), math.Pow(x[i], 3), math.Pow(x[i], 4), f(x[i]), x[i]*f(x[i]), math.Pow(x[i], 2)*f(x[i]), math.Pow(f(x[i]), 2), x[i]*y[i], math.Pow(x[i], 2)*y[i], y[i]*f(x[i]),
+		)
+		sums[0] += x[i]
+		sums[1] += y[i]
+		sums[2] += math.Pow(x[i], 2)
+		sums[3] += math.Pow(x[i], 3)
+		sums[4] += math.Pow(x[i], 4)
+		sums[5] += f(x[i])
+		sums[6] += x[i] * f(x[i])
+		sums[7] += math.Pow(x[i], 2) * f(x[i])
+		sums[8] += math.Pow(f(x[i]), 2)
+		sums[9] += x[i] * y[i]
+		sums[10] += math.Pow(x[i], 2) * y[i]
+		sums[11] += y[i] * f(x[i])
+	}
+	fmt.Println("sumas:")
+	for _, v := range sums {
+		fmt.Printf("%v\t", v)
+	}
+	fmt.Println()
+	m := new(MatrizExtendida)
+	m.Ecuaciones = [][]float64{
+		{float64(len(x)), sums[0], sums[2], sums[5]},
+		{sums[0], sums[2], sums[3], sums[6]},
+		{sums[2], sums[3], sums[4], sums[7]},
+		{sums[5], sums[6], sums[7], sums[8]},
+	}
+	m.Igualdades = []float64{
+		sums[1], sums[9], sums[10], sums[11],
+	}
+	m.Organizar()
+	fmt.Println()
+	m.Mostrar()
+	results := m.Montante()
+	for i := range results {
+		fmt.Printf("%.9f a%v\n", results[i], i)
+	}
+	return func(x float64) float64 {
+		return results[0] + results[1]*x + results[2]*math.Pow(x, 2) + results[3]*f(x)
+	}, nil
 }

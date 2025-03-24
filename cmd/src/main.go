@@ -27,6 +27,26 @@ func main() {
 	fmt.Println(g(4.8))
 	fmt.Println(g(5.2))
 
+	x = []float64{4.8, 5.1, 10.2, 10.9}
+	y = []float64{3.7, 5.2, 6.0, 8.3}
+	f = func(x float64) float64 { return math.Tan(x) }
+	g, err = LinealConFuncion(x, y, f)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(g(4.8))
+	fmt.Println(g(5.1))
+	fmt.Println(g(10.2))
+	fmt.Println(g(10.9))
+	g, err = CuadraticaConFuncion(x, y, f)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(g(4.8))
+	fmt.Println(g(5.1))
+	fmt.Println(g(10.2))
+	fmt.Println(g(10.9))
+
 	/* f, err := cubica([]float64{-2, -1, 0, 1, 2}, []float64{3, 0, 2, 4, 4})
 	if err != nil {
 		panic(err)
@@ -147,7 +167,7 @@ func Cubica(x []float64, y []float64) (func(float64) float64, error) {
 	}
 	fmt.Println("sumas:")
 	for _, v := range sums {
-		fmt.Printf("%v\t", v)
+		fmt.Printf("%.9f\t", v)
 	}
 	fmt.Println()
 	m := new(MatrizExtendida)
@@ -188,7 +208,7 @@ func Cuadratica(x []float64, y []float64) (func(float64) float64, error) {
 	}
 	fmt.Println("sumas:")
 	for _, v := range sums {
-		fmt.Printf("%v\t", v)
+		fmt.Printf("%.9f\t", v)
 	}
 	fmt.Println()
 	m := new(MatrizExtendida)
@@ -211,11 +231,12 @@ func Cuadratica(x []float64, y []float64) (func(float64) float64, error) {
 
 // g(x) = a + bx + cf(x)
 func LinealConFuncion(x []float64, y []float64, f func(float64) float64) (func(float64) float64, error) {
+	fmt.Println("##########################################################################################################################")
 	if len(x) != len(y) {
 		return nil, errors.New("lengths dont match")
 	}
 	sums := [8]float64{}
-	fmt.Printf("x\ty\tx2\tf(x)\txf(x)\tf(x)2\txy\tyf(x)\n")
+	fmt.Printf("x\t\ty\t\tx2\t\tf(x)\t\txf(x)\t\tf(x)2\t\txy\t\tyf(x)\n")
 	for i := range x {
 		fmt.Printf("%.9f\t%.9f\t%.9f\t%.9f\t%.9f\t%.9f\t%.9f\t%.9f\n", x[i], y[i], math.Pow(x[i], 2), f(x[i]), x[i]*f(x[i]), math.Pow(f(x[i]), 2), x[i]*y[i], y[i]*f(x[i]))
 		sums[0] += x[i]
@@ -229,7 +250,7 @@ func LinealConFuncion(x []float64, y []float64, f func(float64) float64) (func(f
 	}
 	fmt.Println("sumas:")
 	for _, v := range sums {
-		fmt.Printf("%v\t", v)
+		fmt.Printf("%.9f\t", v)
 	}
 	fmt.Println()
 	m := new(MatrizExtendida)
@@ -245,19 +266,22 @@ func LinealConFuncion(x []float64, y []float64, f func(float64) float64) (func(f
 	fmt.Println()
 	m.Mostrar()
 	results := m.Montante()
+	fmt.Println()
 	for i := range results {
-		fmt.Printf("%.9f a%v\n", results[i], i)
+		fmt.Printf("a%v = %.9f\n", i, results[i])
 	}
+	fmt.Println()
 	return func(x float64) float64 { return results[0] + results[1]*x + results[2]*f(x) }, nil
 }
 
 // g(x) = a + bx + ax^2 + a3f(x)
 func CuadraticaConFuncion(x []float64, y []float64, f func(float64) float64) (func(float64) float64, error) {
+	fmt.Println("##########################################################################################################################")
 	if len(x) != len(y) {
 		return nil, errors.New("lengths dont match")
 	}
 	sums := [12]float64{}
-	fmt.Printf("x\ty\tx2\tx3\tx4\tf(x)\txf(x)\tx2f(x)\tf(x)2\txy\tx2y\tyf(x)\n")
+	fmt.Printf("x\t\ty\t\tx2\t\tx3\t\tx4\t\tf(x)\t\txf(x)\t\tx2f(x)\t\tf(x)2\t\txy\t\tx2y\t\tyf(x)\n")
 	for i := range x {
 		fmt.Printf("%.9f\t%.9f\t%.9f\t%.9f\t%.9f\t%.9f\t%.9f\t%.9f\t%.9f\t%.9f\t%.9f\t%.9f\n",
 			x[i], y[i], math.Pow(x[i], 2), math.Pow(x[i], 3), math.Pow(x[i], 4), f(x[i]), x[i]*f(x[i]), math.Pow(x[i], 2)*f(x[i]), math.Pow(f(x[i]), 2), x[i]*y[i], math.Pow(x[i], 2)*y[i], y[i]*f(x[i]),
@@ -277,7 +301,7 @@ func CuadraticaConFuncion(x []float64, y []float64, f func(float64) float64) (fu
 	}
 	fmt.Println("sumas:")
 	for _, v := range sums {
-		fmt.Printf("%v\t", v)
+		fmt.Printf("%.9f\t", v)
 	}
 	fmt.Println()
 	m := new(MatrizExtendida)
@@ -294,9 +318,11 @@ func CuadraticaConFuncion(x []float64, y []float64, f func(float64) float64) (fu
 	fmt.Println()
 	m.Mostrar()
 	results := m.Montante()
+	fmt.Println()
 	for i := range results {
-		fmt.Printf("%.9f a%v\n", results[i], i)
+		fmt.Printf("a%v = %.9f\n", i, results[i])
 	}
+	fmt.Println()
 	return func(x float64) float64 {
 		return results[0] + results[1]*x + results[2]*math.Pow(x, 2) + results[3]*f(x)
 	}, nil
